@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+	'channels',
 	'apparking',
 ]
 
@@ -69,6 +70,17 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'apparking_server.wsgi.application'
+
+ASGI_APPLICATION = 'apparking_server.routing.application'
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("redis-server-apparking", 6379)],
+        },
+    },
+}
 
 
 # Database

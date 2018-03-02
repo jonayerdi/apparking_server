@@ -1,0 +1,4 @@
+pip install django
+pip install -U channels
+pip install pypiwin32
+pip install -U channels_redis

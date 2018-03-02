@@ -1,1 +1,1 @@
-python manage.py runserver 0:80
+daphne -b 0.0.0.0 -p 80 apparking_server.asgi:application
