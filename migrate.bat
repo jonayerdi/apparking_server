@@ -1,2 +1,2 @@
 python manage.py migrate
-python manage.py makemigrations fileserver
+python manage.py makemigrations apparking
