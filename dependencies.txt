@@ -1,4 +1,7 @@
-pip install django
-pip install -U channels
-pip install pypiwin32
-pip install -U channels_redis
+Python (3.6.1)
+pip install django (2.0.2)
+pip install -U channels (2.0.2)
+pip install pypiwin32 (220)
+pip install -U channels_redis (2.1.0)
+pip install djangorestframework (3.8.2)
+pip install whitenoise (3.3.1)
