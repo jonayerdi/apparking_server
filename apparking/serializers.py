@@ -1,10 +1,11 @@
 from .models import Profile, Parking, ParkingSpot, ParkingSpotState, Reservation
+from django.db import models
 
-def profile_list_as_dict(profile_list):
-    profiles = []
-    for profile in profile_list:
-        profiles.append(profile.pk)
-    return {"users": profiles}
+def object_list_as_dict(object_list):
+    objects = []
+    for obj in object_list:
+        objects.append(obj.pk)
+    return {"keys": objects}
 
 def profile_as_dict(profile):
     return {
@@ -20,14 +21,32 @@ def profile_as_dict(profile):
         "phone": profile.phone
         }
 
-def parking_list_as_dict(parking_list):
-    parkings = []
-    for parking in parking_list:
-        parkings.append(parking.pk)
-    return {"parkings": parkings}
-
 def parking_as_dict(parking):
+    parking_spots = []
+    for parking_spot in ParkingSpot.objects.filter(parking_id=parking.pk):
+        parking_spots.append(parking_spot_as_dict(parking_spot))
     return {
-        "pk": parking.pk,
-        "name": parking.name
-    }
+            "pk": parking.pk,
+            "name": parking.name,
+            "parking_spots": parking_spots
+            }
+
+def parking_spot_as_dict(parking_spot):
+    parking_spot_state = ParkingSpotState.objects.filter(parking_spot_id=parking_spot.pk).order_by('timestamp').last()
+    return {
+            "pk": parking_spot.pk,
+            "name": parking_spot.name,
+            "state": parking_spot_state_as_dict(parking_spot_state),
+            }
+
+def parking_spot_state_as_dict(parking_spot_state):
+    if parking_spot_state:
+        return {
+                "state": ParkingSpotState.STATE_NAMES[parking_spot_state.state],
+                "timestamp": str(parking_spot_state.timestamp),
+                }
+    else:
+        return {
+                "state": None,
+                "timestamp": None
+                }
