@@ -61,8 +61,17 @@ def api_parkings(request):
         return not_found(request)
 
 def api_reservations(request):
+    content = None
     if request.method == "GET":
-        reservations = Reservation.objects.all()
-        content = json.dumps(object_list_as_dict(reservations), indent=4)
-        return HttpResponse(content, content_type='application/json')
-    return not_found(request)
+        reservation_id = request.GET.get("id", "")
+        if reservation_id != "":
+            reservation = Reservation.objects.filter(pk=reservation_id).first()
+            if reservation:
+                content = json.dumps(reservation_as_dict(reservation), indent=4)
+        else:
+            reservations = Reservation.objects.all()
+            content = json.dumps(object_list_as_dict(reservations), indent=4)
+    if content:
+        return HttpResponse(content=content, content_type='application/json')
+    else:
+        return not_found(request)

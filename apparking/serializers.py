@@ -56,8 +56,8 @@ def parking_spot_state_as_dict(parking_spot_state):
 def reservation_as_dict(reservation):
     return {
         "pk": reservation.pk,
-        "user": reservation.user,
-        "spot": reservation.parking_spot_id,
+        "user": reservation.user.pk,
+        "spot": reservation.parking_spot.pk,
         "timestamp": str(reservation.timestamp),
         "begin": str(reservation.begin),
         "end": str(reservation.end),
