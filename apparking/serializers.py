@@ -24,7 +24,7 @@ def profile_as_dict(profile):
 def parking_as_dict(parking):
     parking_spots = []
     for parking_spot in ParkingSpot.objects.filter(parking_id=parking.pk):
-        parking_spots.append(parking_spot_as_dict(parking_spot))
+        parking_spots.append(parking_spot.pk)
     return {
             "pk": parking.pk,
             "name": parking.name,
@@ -36,17 +36,30 @@ def parking_spot_as_dict(parking_spot):
     return {
             "pk": parking_spot.pk,
             "name": parking_spot.name,
-            "state": parking_spot_state_as_dict(parking_spot_state),
+            "state": parking_spot_state_as_dict(parking_spot_state)
             }
 
 def parking_spot_state_as_dict(parking_spot_state):
     if parking_spot_state:
         return {
                 "state": ParkingSpotState.STATE_NAMES[parking_spot_state.state],
-                "timestamp": str(parking_spot_state.timestamp),
+                "forced": parking_spot_state.forced,
+                "timestamp": str(parking_spot_state.timestamp)
                 }
     else:
         return {
                 "state": None,
+                "forced": None,
                 "timestamp": None
                 }
+
+def reservation_as_dict(reservation):
+    return {
+        "pk": reservation.pk,
+        "user": reservation.user,
+        "spot": reservation.parking_spot_id,
+        "timestamp": str(reservation.timestamp),
+        "begin": str(reservation.begin),
+        "end": str(reservation.end),
+        "status": Reservation.STATUS_NAMES[reservation.status],
+        }

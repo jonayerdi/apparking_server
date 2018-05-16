@@ -37,6 +37,7 @@ class ParkingSpotState(models.Model):
 	parking_spot_id = models.ForeignKey(to=ParkingSpot, on_delete=models.CASCADE)
 	timestamp = models.DateTimeField(default=timezone.now)
 	state = models.IntegerField(choices=STATES, default=0)
+	forced = models.BooleanField(default=False)
 
 class Reservation(models.Model):
 	STATUS = ((0, 'Active'), (1, 'UserCancelled'), (2, 'StaffCancelled'))
