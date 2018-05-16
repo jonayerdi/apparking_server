@@ -20,3 +20,5 @@ urlpatterns = [
 	path('', include('apparking.urls')),
     path('admin/', admin.site.urls),
 ]
+
+handler404 = 'apparking.views.not_found'

@@ -1,0 +1,14 @@
+
+.center {
+    display:flex;
+    justify-content:center;
+    align-items: center;
+}
+.center > h1 {
+    font-family: Impact;
+    font-size: 128px;
+}
+.center > h2 {
+    font-family: Impact;
+    font-size: 86px;
+}
