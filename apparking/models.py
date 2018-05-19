@@ -21,9 +21,9 @@ class Parking(models.Model):
 class ParkingSpot(models.Model):
 	id = models.AutoField(primary_key=True)
 	parking = models.ForeignKey(to=Parking, on_delete=models.CASCADE)
-	name = models.TextField(default='')
+	number = models.IntegerField(default=0)
 	class Meta:
-		unique_together = (('parking', 'name'))
+		unique_together = (('parking', 'number'))
 
 @receiver(post_save, sender=ParkingSpot)
 def create_parking_spot_state(sender, instance, created, **kwargs):

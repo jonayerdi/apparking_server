@@ -35,7 +35,7 @@ def parking_spot_as_dict(parking_spot):
     parking_spot_state = ParkingSpotState.objects.filter(parking_spot_id=parking_spot.pk).order_by('timestamp').last()
     return {
             "pk": parking_spot.pk,
-            "name": parking_spot.name,
+            "number": parking_spot.number,
             "state": parking_spot_state_as_dict(parking_spot_state)
             }
 
