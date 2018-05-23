@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 
+{% block extra_headers %}
+	<script type="text/javascript" src="{% static 'js/index.js' %}"></script>     
+{% endblock %}
+
 {% block content %}
-	<img src="{% static 'img/apparking_logo.png' %}"/>
+	<h2>Parkings:</h2>
+	<ul id="parkings"></ul>
 {% endblock %}
