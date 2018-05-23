@@ -7,6 +7,12 @@ def object_list_as_dict(object_list):
         objects.append(obj.pk)
     return {"keys": objects}
 
+def parking_list_as_dict(parking_list):
+    parkings = []
+    for parking in parking_list:
+        parkings.append({"key": parking.pk, "name": parking.name})
+    return {"parkings": parkings}
+
 def profile_as_dict(profile):
     return {
         "pk": profile.pk,

@@ -44,6 +44,7 @@ def api_parkings(request):
     if request.method == "GET":
         parking_id = request.GET.get("id", "")
         spot_id = request.GET.get("spot", "")
+        names = request.GET.get("names", "")
         if parking_id != "":
             parking = Parking.objects.filter(pk=parking_id).first()
             if parking:
@@ -54,7 +55,10 @@ def api_parkings(request):
                 content = json.dumps(parking_spot_as_dict(spot), indent=4)
         else:
             parkings = Parking.objects.all()
-            content = json.dumps(object_list_as_dict(parkings), indent=4)
+            if names == "1":
+                content = json.dumps(parking_list_as_dict(parkings), indent=4)
+            else:
+                content = json.dumps(object_list_as_dict(parkings), indent=4)
     if content:
         return HttpResponse(content=content, content_type='application/json')
     else:
