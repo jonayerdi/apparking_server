@@ -28,7 +28,7 @@ class ParkingSpot(models.Model):
 @receiver(post_save, sender=ParkingSpot)
 def create_parking_spot_state(sender, instance, created, **kwargs):
     if created:
-        ParkingSpotState.objects.create(parking_spot_id=instance)
+        ParkingSpotState.objects.create(parking_spot=instance)
 
 class ParkingSpotState(models.Model):
 	STATES = ((0, 'Unknown'), (1, 'Freeing'), (2, 'Free'), (3, 'Taking'), (4, 'Taken'))
