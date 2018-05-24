@@ -59,6 +59,12 @@ def parking_spot_state_as_dict(parking_spot_state):
                 "timestamp": None
                 }
 
+def camera_list_as_dict(camera_list):
+    cameras = []
+    for camera in camera_list:
+        cameras.append({"key": camera.pk, "number": camera.number})
+    return {"cameras": cameras}
+
 def reservation_as_dict(reservation):
     return {
         "pk": reservation.pk,

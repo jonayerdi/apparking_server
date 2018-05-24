@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.contrib.auth.models import User
-from .models import Profile, Parking, ParkingSpot, ParkingSpotState, Reservation
+from .models import Profile, Parking, ParkingSpot, ParkingSpotState, ParkingCamera, Reservation
 from .serializers import *
 import json
 
@@ -66,6 +66,20 @@ def api_parkings(request):
                 content = json.dumps(parking_list_as_dict(parkings), indent=4)
             else:
                 content = json.dumps(object_list_as_dict(parkings), indent=4)
+    if content:
+        return HttpResponse(content=content, content_type='application/json')
+    else:
+        return not_found(request)
+
+def api_cameras(request):
+    content = None
+    if request.method == "GET":
+        parking_id = request.GET.get("parking", "")
+        if parking_id != "":
+            cameras = ParkingCamera.objects.filter(pk=parking_id)
+        else:
+            cameras = ParkingCamera.objects.all()
+        content = json.dumps(camera_list_as_dict(cameras), indent=4)
     if content:
         return HttpResponse(content=content, content_type='application/json')
     else:

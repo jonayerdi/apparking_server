@@ -39,6 +39,14 @@ class ParkingSpotState(models.Model):
 	state = models.IntegerField(choices=STATES, default=0)
 	forced = models.BooleanField(default=False)
 
+class ParkingCamera(models.Model):
+	id = models.AutoField(primary_key=True)
+	parking = models.ForeignKey(to=Parking, on_delete=models.CASCADE)
+	number = models.IntegerField(default=0)
+	imageFile = models.TextField(unique=True)
+	class Meta:
+		unique_together = (('parking', 'number'))
+
 class Reservation(models.Model):
 	STATUS = ((0, 'Active'), (1, 'UserCancelled'), (2, 'StaffCancelled'))
 	STATUS_NAMES = {e[0]: e[1] for e in STATUS}
