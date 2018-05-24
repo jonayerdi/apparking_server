@@ -15,6 +15,13 @@ def index(request):
         return render(request, 'index.html')
     return not_found(request)
 
+def parkings(request, pk):
+    if request.method == "GET":
+        parking = Parking.objects.filter(pk=pk).first()
+        if parking:
+            return render(request, 'parkings.html', {'parkingId': parking.pk})
+    return not_found(request)
+
 #REST API
 def api_users(request):
     content = None
