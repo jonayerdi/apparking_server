@@ -1,4 +1,5 @@
 from channels.generic.websocket import WebsocketConsumer
+from django.utils import timezone
 from .zybo_bridge.ZyboBridge import ZyboBridge
 import threading
 import queue
@@ -42,8 +43,15 @@ class ParkingConsumer(WebsocketConsumer):
                 log.warn('WebSocket receive unknown message type: {}'.format(msg['type']))
         except Exception:
             pass
+
             
     def disconnect(self, code):
+        with parkingSpotSubscriptionsLock:
+            for parking in parkingSpotSubscriptions.keys():
+                for conn in parkingSpotSubscriptions[parking]:
+                    if self == conn:
+                        parkingSpotSubscriptions[parking].remove(self)
+                        log.info('ParkingConsumer unsubscribe: {}'.format(parking))
         log.info('ParkingConsumer disconnect: {}'.format(code))
 
 # WebSocket notifier class
@@ -57,10 +65,12 @@ class ParkingNotifier(threading.Thread):
             try:
                 msg = self.messagesQueue.get()
                 if msg['type'] == 'ParkingSpotUpdate':
+                    msg['timestamp'] = str(timezone.now())
+                    log.debug('Sending message: {}'.format(json.dumps(msg)))
                     with parkingSpotSubscriptionsLock:
                         if msg['parkingId'] in parkingSpotSubscriptions:
                             for conn in parkingSpotSubscriptions[msg['parkingId']]:
-                                conn.send(msg)
+                                conn.send(json.dumps(msg))
                 elif msg['type'] == 'ImageUpdate':
                     pass #TODO
                 self.messagesQueue.task_done()
@@ -69,6 +79,7 @@ class ParkingNotifier(threading.Thread):
 
 # Start ZyboBridge server
 log = logging.getLogger('ZyboBridge')
+log.setLevel(logging.DEBUG)
 zyboBridge = ZyboBridge(ip='127.0.0.1', port=6969, logger=log)
 zyboBridge.start()
 

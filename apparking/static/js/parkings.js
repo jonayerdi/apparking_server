@@ -1,6 +1,38 @@
 
 var $parkingName;
 var $parkingSpots;
+var ws;
+
+function subscribeParking() {
+    var ws_path = 'ws://' + window.location.host + "/ws/parking/";
+    ws  = new ReconnectingWebSocket(ws_path);
+    ws.onopen = function(e) {
+        console.log('WebSocket is open.');
+        ws.send(JSON.stringify({
+            'type': 'ParkingSubscribe',
+            'parkingId': parkingId
+        }));
+    };
+    ws.onclose = function(e) {
+        console.log('WebSocket is closed.');
+    };
+    ws.onmessage = function(e) {
+        var spot = JSON.parse(e.data);
+        console.debug(spot);
+        updateParkingSpot(spot);
+    };
+}
+
+function updateParkingSpot(spot)
+{
+    $spotState = $('#spotState'+spot["spotId"]);
+    $spotTimestamp = $('#spotTimestamp'+spot["spotId"]);
+    if($spotState != null && $spotTimestamp != null)
+    {
+        $spotState.text("State: "+spot["state"]);
+        $spotTimestamp.text("Timestamp: "+spot["timestamp"]);
+    }
+}
 
 function updateParkingName(name) {
     $parkingName.text(name);
@@ -8,8 +40,8 @@ function updateParkingName(name) {
 
 function appendParkingSpot(spot) {
     state = spot["state"];
-    $parkingSpots.append("<li id=spot\""+spot["number"]+"\"><ul><li>Number: "+spot["number"]
-    +"</li><li>Status: <ul><li>State: "+state["state"]+"</li><li>Timestamp: "+state["timestamp"]+"</li></ul></li></ul></li>")
+    $parkingSpots.append("<li><ul><li>Number: "+spot["number"]+"</li><li>Status: <ul><li id=spotState"+spot["number"]
+    +">State: "+state["state"]+"</li><li id=spotTimestamp"+spot["number"]+">Timestamp: "+state["timestamp"]+"</li></ul></li></ul></li>")
 }
 
 function requestParkingSpot(spotId) {
@@ -48,4 +80,5 @@ $(document).ready(function() {
     $parkingName = $('#parkingName');
     $parkingSpots = $('#parkingSpots');
     updateParking();
+    subscribeParking();
 });
