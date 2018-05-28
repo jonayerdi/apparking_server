@@ -33,6 +33,7 @@ def create_parking_spot_state(sender, instance, created, **kwargs):
 class ParkingSpotState(models.Model):
 	STATES = ((0, 'Unknown'), (1, 'Freeing'), (2, 'Free'), (3, 'Taking'), (4, 'Taken'))
 	STATE_NAMES = {e[0]: e[1] for e in STATES}
+	STATE_CODES = {e[1]: e[0] for e in STATES}
 	id = models.AutoField(primary_key=True)
 	parking_spot = models.ForeignKey(to=ParkingSpot, on_delete=models.CASCADE)
 	timestamp = models.DateTimeField(default=timezone.now)

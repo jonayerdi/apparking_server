@@ -1,4 +1,5 @@
 from channels.generic.websocket import WebsocketConsumer
+from .models import ParkingSpot, ParkingSpotState
 from django.utils import timezone
 from .zybo_bridge.ZyboBridge import ZyboBridge
 import threading
@@ -65,6 +66,12 @@ class ParkingNotifier(threading.Thread):
             try:
                 msg = self.messagesQueue.get()
                 if msg['type'] == 'ParkingSpotUpdate':
+                    #Update state
+                    parkingSpot = ParkingSpot.objects.filter(parking=msg['parkingId']).filter(number=msg['spotId']).first()
+                    newState = ParkingSpotState(parking_spot=parkingSpot
+                        , state=ParkingSpotState.STATE_CODES[msg['state']], forced=msg['forced'])
+                    newState.save()
+                    #Send to Subscribers
                     msg['timestamp'] = str(timezone.now())
                     log.debug('Sending message: {}'.format(json.dumps(msg)))
                     with parkingSpotSubscriptionsLock:

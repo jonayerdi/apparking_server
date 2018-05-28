@@ -29,7 +29,7 @@ def profile_as_dict(profile):
 
 def parking_as_dict(parking):
     parking_spots = []
-    for parking_spot in ParkingSpot.objects.filter(parking_id=parking.pk):
+    for parking_spot in ParkingSpot.objects.filter(parking=parking.pk):
         parking_spots.append(parking_spot.pk)
     return {
             "pk": parking.pk,
@@ -38,7 +38,7 @@ def parking_as_dict(parking):
             }
 
 def parking_spot_as_dict(parking_spot):
-    parking_spot_state = ParkingSpotState.objects.filter(parking_spot_id=parking_spot.pk).order_by('timestamp').last()
+    parking_spot_state = ParkingSpotState.objects.filter(parking_spot=parking_spot.pk).order_by('timestamp').last()
     return {
             "pk": parking_spot.pk,
             "number": parking_spot.number,
