@@ -2,6 +2,7 @@
 var $parkingName;
 var $parkingSpots;
 var ws;
+var spotNumber2spotId = {};
 
 function subscribeParking() {
     var ws_path = 'ws://' + window.location.host + "/ws/parking/";
@@ -25,8 +26,9 @@ function subscribeParking() {
 
 function updateParkingSpot(spot)
 {
-    $spotState = $('#spotState'+spot["spotId"]);
-    $spotTimestamp = $('#spotTimestamp'+spot["spotId"]);
+    spotId = spotNumber2spotId[spot["spotId"]];
+    $spotState = $('#spotState'+spotId);
+    $spotTimestamp = $('#spotTimestamp'+spotId);
     if($spotState != null && $spotTimestamp != null)
     {
         $spotState.text("State: "+spot["state"]);
@@ -38,10 +40,10 @@ function updateParkingName(name) {
     $parkingName.text(name);
 }
 
-function appendParkingSpot(spot) {
-    state = spot["state"];
-    $parkingSpots.append("<li><ul><li>Number: "+spot["number"]+"</li><li>Status: <ul><li id=spotState"+spot["number"]
-    +">State: "+state["state"]+"</li><li id=spotTimestamp"+spot["number"]+">Timestamp: "+state["timestamp"]+"</li></ul></li></ul></li>")
+function appendParkingSpot(spotId) {
+    $parkingSpots.append("<li><ul><li id=spotNumber"+spotId
+    +">Number: Requesting...</li><li>Status: <ul><li id=spotState"+spotId
+    +">State: Requesting...</li><li id=spotTimestamp"+spotId+">Timestamp: Requesting...</li></ul></li></ul></li>")
 }
 
 function requestParkingSpot(spotId) {
@@ -49,7 +51,13 @@ function requestParkingSpot(spotId) {
 		url: '/api/parkings/?spot=' + spotId,
         method : 'GET',
 		success: function(data) {
-			appendParkingSpot(data);
+            $spotNumber = $("#spotNumber"+spotId);
+            $spotState = $("#spotState"+spotId);
+            $spotTimestamp = $("#spotTimestamp"+spotId);
+			$spotNumber.text("Number: " + data["number"]);
+            $spotState.text("State: " + data["state"]["state"]);
+            $spotTimestamp.text("Timestamp: " + data["state"]["timestamp"]);
+            spotNumber2spotId[data["number"]] = spotId;
 		},
 		failure: function(data) { 
 			console.warn("Failed parking spot request to /api/parkings/");
@@ -59,7 +67,9 @@ function requestParkingSpot(spotId) {
 
 function updateParkingSpots(spots) {
     $parkingSpots.empty();
+    spots.forEach(appendParkingSpot);
     spots.forEach(requestParkingSpot);
+    subscribeParking();
 }
 
 function updateParking() {
@@ -80,5 +90,4 @@ $(document).ready(function() {
     $parkingName = $('#parkingName');
     $parkingSpots = $('#parkingSpots');
     updateParking();
-    subscribeParking();
 });
