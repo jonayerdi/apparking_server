@@ -9,7 +9,7 @@ from .ZyboBridgeConnection  import ZyboBridgeConnection
 from .ZyboBridgeSender  import ZyboBridgeSender
 
 class ZyboBridge(threading.Thread):
-	def __init__(self, serverId=b'\x00000000', ip='127.0.0.1', port=6969, logger=logging.getLogger()):
+	def __init__(self, serverId=b'\x00000000', ip='0.0.0.0', port=6969, logger=logging.getLogger()):
 		super().__init__()
 		self.logger = logger
 		self.serverId = serverId

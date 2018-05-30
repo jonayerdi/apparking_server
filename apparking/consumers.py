@@ -87,7 +87,7 @@ class ParkingNotifier(threading.Thread):
 # Start ZyboBridge server
 log = logging.getLogger('ZyboBridge')
 log.setLevel(logging.DEBUG)
-zyboBridge = ZyboBridge(ip='127.0.0.1', port=6969, logger=log)
+zyboBridge = ZyboBridge(ip='0.0.0.0', port=6969, logger=log)
 zyboBridge.start()
 
 # Start WebSocket notifier
