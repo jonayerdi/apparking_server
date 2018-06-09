@@ -124,7 +124,7 @@ def api_reservations(request):
             content = json.dumps(object_list_as_dict(reservations), indent=4)
     elif request.method == "POST":
         if request.user.is_authenticated():
-            reservation = Reservation.objects.filter(user=request.user, begin__gte=timezone.now, end__lt=timezone.now, status=0).first()
+            reservation = Reservation.objects.filter(user=request.user, begin__lte=timezone.now(), end__gt=timezone.now(), status=0).first()
             if reservation:
                 return HttpResponse(content=json.dumps({"message": "user has a reservation already"}), content_type='application/json')
             else:

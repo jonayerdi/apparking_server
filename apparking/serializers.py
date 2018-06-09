@@ -1,5 +1,6 @@
 from .models import Profile, Parking, ParkingSpot, ParkingSpotState, Reservation
 from django.db import models
+from django.utils import timezone
 
 def object_list_as_dict(object_list):
     objects = []
@@ -39,9 +40,14 @@ def parking_as_dict(parking):
 
 def parking_spot_as_dict(parking_spot):
     parking_spot_state = ParkingSpotState.objects.filter(parking_spot=parking_spot.pk).order_by('timestamp').last()
+    reservation = Reservation.objects.filter(parking_spot=parking_spot.pk,begin__lte=timezone.now(), end__gt=timezone.now(), status=0).first()
+    reservation_id = None
+    if reservation:
+        reservation_id = reservation.pk
     return {
             "pk": parking_spot.pk,
             "number": parking_spot.number,
+            "reservation": reservation_id,
             "state": parking_spot_state_as_dict(parking_spot_state)
             }
 
@@ -53,11 +59,7 @@ def parking_spot_state_as_dict(parking_spot_state):
                 "timestamp": str(parking_spot_state.timestamp)
                 }
     else:
-        return {
-                "state": None,
-                "forced": None,
-                "timestamp": None
-                }
+        return {}
 
 def camera_list_as_dict(camera_list):
     cameras = []
