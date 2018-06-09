@@ -1,13 +1,39 @@
-from django.shortcuts import render
+from django.shortcuts import render, render_to_response, redirect
 from django.http import HttpResponse
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+from django.utils import timezone
 from .models import Profile, Parking, ParkingSpot, ParkingSpotState, ParkingCamera, Reservation
 from .serializers import *
 import json
+from datetime import datetime
 
 #Errors
 def not_found(request, exception=None):
     return render(request, '404.html', status=404)
+
+#Authentication
+def login_user(request):
+    logout(request)
+    username = password = None
+    if request.POST:
+        username = request.POST['username']
+        password = request.POST['password']
+    elif request.GET:
+        username = request.GET['username']
+        password = request.GET['password']
+
+    if username and password:
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            if user.is_active:
+                login(request, user)
+                return redirect('/')
+    return not_found(request)
+
+def logout_user(request):
+    logout(request)
+    return redirect('/')
 
 #Web Pages
 def index(request):
@@ -96,6 +122,26 @@ def api_reservations(request):
         else:
             reservations = Reservation.objects.all()
             content = json.dumps(object_list_as_dict(reservations), indent=4)
+    elif request.method == "POST":
+        if request.user.is_authenticated():
+            reservation = Reservation.objects.filter(user=request.user, begin__gte=timezone.now, end__lt=timezone.now, status=0).first()
+            if reservation:
+                return HttpResponse(content=json.dumps({"message": "user has a reservation already"}), content_type='application/json')
+            else:
+                begin = datetime.strptime(request.POST.get("begin", ""), '%Y-%m-%d %H:%M')
+                end = datetime.strptime(request.POST.get("end", ""), '%Y-%m-%d %H:%M')
+                spot_id = request.POST.get("spot", "")
+                spot = ParkingSpot.objects.filter(pk=spot_id).first()
+                if not spot:
+                    return HttpResponse(content=json.dumps({"message": "parking spot not found"}), content_type='application/json')
+                elif end-begin > datetime.timedelta.__new__(hours=4):
+                    return HttpResponse(content=json.dumps({"message": "reservation timespan too long"}), content_type='application/json')
+                else:
+                    reservation = Reservation(user=request.user, parking_spot=spot, begin=begin, end=end)
+                    reservation.save()
+                    return HttpResponse(content=json.dumps({"message": "ok"}), content_type='application/json')
+        else:
+            return HttpResponse(content=json.dumps({"message": "user must be authenticated for this api"}), content_type='application/json')
     if content:
         return HttpResponse(content=content, content_type='application/json')
     else:
