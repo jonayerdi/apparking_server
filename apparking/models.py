@@ -17,6 +17,7 @@ def create_user_profile(sender, instance, created, **kwargs):
 class Parking(models.Model):
 	id = models.AutoField(primary_key=True)
 	name = models.TextField(unique=True)
+	dataFolder = models.TextField(unique=True)
 
 class ParkingSpot(models.Model):
 	id = models.AutoField(primary_key=True)

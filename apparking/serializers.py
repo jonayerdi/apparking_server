@@ -35,6 +35,8 @@ def parking_as_dict(parking):
     return {
             "pk": parking.pk,
             "name": parking.name,
+            "image": '/static/data/{}/parking.bmp'.format(parking.dataFolder),
+            "layout": '/static/data/{}/parking.json'.format(parking.dataFolder),
             "parking_spots": parking_spots
             }
 
