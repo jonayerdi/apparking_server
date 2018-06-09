@@ -1,4 +1,4 @@
-from .models import Profile, Parking, ParkingSpot, ParkingSpotState, Reservation
+from .models import *
 from django.db import models
 from django.utils import timezone
 
@@ -63,10 +63,24 @@ def parking_spot_state_as_dict(parking_spot_state):
     else:
         return {}
 
+def camera_as_dict(camera):
+    spot_list = ParkingCameraSpot.objects.filter(camera=camera)
+    return {
+            "pk": camera.pk,
+            "number": camera.number,
+            "parking_spots": camera_spots_list_as_dict(spot_list)
+            }
+
+def camera_spots_list_as_dict(spot_list):
+    spots = []
+    for spot in spot_list:
+        spots.append({"spot": spot.parking_spot.pk, "code": spot.code})
+    return spots
+
 def camera_list_as_dict(camera_list):
     cameras = []
     for camera in camera_list:
-        cameras.append({"key": camera.pk, "number": camera.number})
+        cameras.append({"pk": camera.pk, "number": camera.number})
     return {"cameras": cameras}
 
 def reservation_as_dict(reservation):

@@ -100,12 +100,18 @@ def api_parkings(request):
 def api_cameras(request):
     content = None
     if request.method == "GET":
-        parking_id = request.GET.get("parking", "")
-        if parking_id != "":
-            cameras = ParkingCamera.objects.filter(pk=parking_id)
+        camera_id = request.GET.get("id", "")
+        if camera_id != "":
+            camera = ParkingCamera.objects.filter(pk=camera_id).first()
+            if camera:
+                content = json.dumps(camera_as_dict(camera), indent=4)
         else:
-            cameras = ParkingCamera.objects.all()
-        content = json.dumps(camera_list_as_dict(cameras), indent=4)
+            parking_id = request.GET.get("parking", "")
+            if parking_id != "":
+                cameras = ParkingCamera.objects.filter(pk=parking_id)
+            else:
+                cameras = ParkingCamera.objects.all()
+            content = json.dumps(camera_list_as_dict(cameras), indent=4)
     if content:
         return HttpResponse(content=content, content_type='application/json')
     else:

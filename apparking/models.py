@@ -45,9 +45,17 @@ class ParkingCamera(models.Model):
 	id = models.AutoField(primary_key=True)
 	parking = models.ForeignKey(to=Parking, on_delete=models.CASCADE)
 	number = models.IntegerField(default=0)
-	imageFile = models.TextField(unique=True)
+	dataFolder = models.TextField(unique=True)
 	class Meta:
 		unique_together = (('parking', 'number'))
+
+class ParkingCameraSpot(models.Model):
+	id = models.AutoField(primary_key=True)
+	camera = models.ForeignKey(to=ParkingCamera, on_delete=models.CASCADE)
+	parking_spot = models.ForeignKey(to=ParkingSpot, on_delete=models.CASCADE)
+	code = models.IntegerField(default=0)
+	class Meta:
+		unique_together = (('camera', 'parking_spot'))
 
 class Reservation(models.Model):
 	STATUS = ((0, 'Active'), (1, 'UserCancelled'), (2, 'StaffCancelled'))
