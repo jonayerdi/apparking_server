@@ -1,5 +1,6 @@
 from django.shortcuts import render, render_to_response, redirect
 from django.http import HttpResponse
+from django.views.decorators.cache import never_cache
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -7,6 +8,10 @@ from .models import Profile, Parking, ParkingSpot, ParkingSpotState, ParkingCame
 from .serializers import *
 import json
 from datetime import datetime
+import os
+
+#Apparking camera images location
+CAMERAS_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'cameras')
 
 #Errors
 def not_found(request, exception=None):
@@ -46,6 +51,20 @@ def parkings(request, pk):
         parking = Parking.objects.filter(pk=pk).first()
         if parking:
             return render(request, 'parkings.html', {'parkingId': parking.pk})
+    return not_found(request)
+
+#Camera images
+@never_cache
+def camera_image(request, pk):
+    if request.method == "GET":
+        camera = ParkingCamera.objects.filter(pk=pk).first()
+        if camera:
+            file_path = os.path.join(CAMERAS_ROOT, camera.dataFolder, 'image.bmp')
+            with open(file_path, 'rb') as fsock:
+                response = HttpResponse(content=fsock.read(), content_type='image/bmp')
+            response["Cache-Control"] = "no-cache, no-store, must-revalidate"
+            response['Pragma'] = 'no-cache'
+            return response
     return not_found(request)
 
 #REST API

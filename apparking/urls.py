@@ -5,6 +5,8 @@ urlpatterns = [
     #Web Pages
     url(r'^$', views.index, name='index'),
     url(r'^parkings/(?P<pk>\d+)/$', views.parkings, name='parkings'),
+    #Cameras
+    url(r'^cameras/(?P<pk>\d+)/$', views.camera_image, name='camera_image'),
     #Authentication
     url(r'^login/$', views.login_user, name='login_user'),
     url(r'^logout/$', views.logout_user, name='logout_user'),

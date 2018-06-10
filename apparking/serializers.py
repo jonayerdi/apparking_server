@@ -68,7 +68,6 @@ def camera_as_dict(camera):
     return {
             "pk": camera.pk,
             "number": camera.number,
-            "image": '/static/data/{}/image.bmp'.format(camera.dataFolder),
             "parking_spots": camera_spots_list_as_dict(spot_list)
             }
 
