@@ -2,7 +2,7 @@
 var $parkings;
 
 function appendParking(item, index) {
-    $parkings.append("<li><a href=/parkings/"+item["key"]+">"+item["name"]+"</a></li>")
+    $parkings.append("<li><a href=/parkings/"+item["pk"]+">"+item["name"]+"</a></li>")
 }
 
 function updateParkings() {

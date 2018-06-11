@@ -42,29 +42,47 @@ def logout_user(request):
 
 #Web Pages
 def index(request):
+    return redirect('/parkings')
+
+def parkings_list(request):
     if request.method == "GET":
-        return render(request, 'index.html')
+        return render(request, 'parkingsList.html')
     return not_found(request)
 
-def parkings(request, pk):
+def parking(request, pk):
     if request.method == "GET":
         parking = Parking.objects.filter(pk=pk).first()
         if parking:
-            return render(request, 'parkings.html', {'parkingId': parking.pk})
+            return render(request, 'parking.html', {'parkingId': parking.pk})
+    return not_found(request)
+
+def camera_list(request):
+    if request.method == "GET":
+        return render(request, 'camerasList.html')
+    return not_found(request)
+
+def camera(request, pk):
+    if request.method == "GET":
+        camera = ParkingCamera.objects.filter(pk=pk).first()
+        if camera:
+            return render(request, 'camera.html', {'cameraId': camera.pk})
     return not_found(request)
 
 #Camera images
 @never_cache
 def camera_image(request, pk):
     if request.method == "GET":
-        camera = ParkingCamera.objects.filter(pk=pk).first()
-        if camera:
-            file_path = os.path.join(CAMERAS_ROOT, camera.dataFolder, 'image.bmp')
-            with open(file_path, 'rb') as fsock:
-                response = HttpResponse(content=fsock.read(), content_type='image/bmp')
-            response["Cache-Control"] = "no-cache, no-store, must-revalidate"
-            response['Pragma'] = 'no-cache'
-            return response
+        try:
+            camera = ParkingCamera.objects.filter(pk=pk).first()
+            if camera:
+                file_path = os.path.join(CAMERAS_ROOT, camera.dataFolder, 'image.bmp')
+                with open(file_path, 'rb') as fsock:
+                    response = HttpResponse(content=fsock.read(), content_type='image/bmp')
+                response["Cache-Control"] = "no-cache, no-store, must-revalidate"
+                response['Pragma'] = 'no-cache'
+                return response
+        except Exception:
+            pass
     return not_found(request)
 
 #REST API
