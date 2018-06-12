@@ -58,7 +58,7 @@ function requestParkingSpot(spotId) {
 }
 
 function updateParkingSVG() {
-    svgElement = "<svg id='layoutSVG' height='600' width='800'><image xlink:href='"+backgroundURL+"'></image>";
+    svgElement = "<svg id='layoutSVG' height='600' width='800'><image height='600' width='800' xlink:href='"+backgroundURL+"'></image>";
     for (var key in spots) {
         if (spots.hasOwnProperty(key)) {
             x = spots[key]["x1"];
