@@ -53,7 +53,10 @@ def parking(request, pk):
     if request.method == "GET":
         parking = Parking.objects.filter(pk=pk).first()
         if parking:
-            return render(request, 'parking.html', {'parkingId': parking.pk})
+            if request.GET.get("text", "") != "":
+                return render(request, 'parking.html', {'parkingId': parking.pk})
+            else:
+                return render(request, 'parkingLayout.html', {'parkingId': parking.pk})
     return not_found(request)
 
 def camera_list(request):

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block extra_headers %}
+    <script type="text/javascript">
+        var parkingId = {{parkingId}};
+    </script>
+    <script type="text/javascript" src="{% static 'js/reconnecting-websocket.min.js' %}"></script>     
+    <script type="text/javascript" src="{% static 'js/parkingLayout.js' %}"></script>  
+{% endblock %}
+
+{% block content %}
+    <h2 id="parkingName"></h2>
+	<div id="layout"></div>
+{% endblock %}
