@@ -79,7 +79,7 @@ class ZyboBridgeConnection(threading.Thread):
         image = self.readBytes(imageSize)
         if self.parkingId is not None:
             msg = {'type': 'ImageUpdate', 'parkingId': self.parkingId, 'cameraId': cameraId, 'image': image}
-            self.logger.debug('Adding message from {} to queue'.format(self.address))
+            self.logger.debug('Adding message from {} to queue: imageSize={}'.format(self.address, imageSize))
             self.server.messagesIn.put(msg)
         else:
             self.logger.debug('ImageUpdate from {} discarded, no parkingId assigned'.format(self.address))

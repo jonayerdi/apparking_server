@@ -1,11 +1,13 @@
 from channels.generic.websocket import WebsocketConsumer
-from .models import ParkingSpot, ParkingSpotState
+from .models import ParkingSpot, ParkingSpotState, ParkingCamera
+from .views import CAMERAS_ROOT
 from django.utils import timezone
 from .zybo_bridge.ZyboBridge import ZyboBridge
 import threading
 import queue
 import logging
 import json
+import os
 
 # Global ParkingConsumer subscriptions
 parkingSpotSubscriptions = {}
@@ -79,7 +81,12 @@ class ParkingNotifier(threading.Thread):
                             for conn in parkingSpotSubscriptions[msg['parkingId']]:
                                 conn.send(json.dumps(msg))
                 elif msg['type'] == 'ImageUpdate':
-                    pass #TODO
+                    #Find image folder
+                    camera = ParkingCamera.objects.filter(parking=msg['parkingId']).filter(number=msg['cameraId']).first()
+                    imageFile = os.path.join(CAMERAS_ROOT, camera.dataFolder, 'image.png')
+                    #Write image into file
+                    with open(imageFile, 'wb') as fsock:
+                        fsock.write(msg['image'])
                 self.messagesQueue.task_done()
             except Exception as e:
                 log.error('Exception processing message from ZyboBridge: {}'.format(e))

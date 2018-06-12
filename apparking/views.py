@@ -75,9 +75,9 @@ def camera_image(request, pk):
         try:
             camera = ParkingCamera.objects.filter(pk=pk).first()
             if camera:
-                file_path = os.path.join(CAMERAS_ROOT, camera.dataFolder, 'image.bmp')
+                file_path = os.path.join(CAMERAS_ROOT, camera.dataFolder, 'image.png')
                 with open(file_path, 'rb') as fsock:
-                    response = HttpResponse(content=fsock.read(), content_type='image/bmp')
+                    response = HttpResponse(content=fsock.read(), content_type='image/png')
                 response["Cache-Control"] = "no-cache, no-store, must-revalidate"
                 response['Pragma'] = 'no-cache'
                 return response
