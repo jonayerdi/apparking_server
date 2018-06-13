@@ -9,4 +9,5 @@ from . import consumers
 
 websocket_urlpatterns = [
     url(r'^ws/parking/$', consumers.ParkingConsumer),
+    url(r'^ws/camera/$', consumers.CameraConsumer),
 ]

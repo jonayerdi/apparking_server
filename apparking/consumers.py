@@ -41,7 +41,7 @@ class ParkingConsumer(WebsocketConsumer):
                             parkingSpotSubscriptions[msg['parkingId']].remove(self)
                             log.info('ParkingConsumer unsubscribe: {}'.format(msg['parkingId']))
             elif msg['type'] == 'ParkingSpotUpdate':
-                zyboBridge.messagesOut.put(msg)
+                pass #zyboBridge.messagesOut.put(msg)
             else:
                 log.warn('WebSocket receive unknown message type: {}'.format(msg['type']))
         except Exception:
@@ -56,6 +56,44 @@ class ParkingConsumer(WebsocketConsumer):
                         parkingSpotSubscriptions[parking].remove(self)
                         log.info('ParkingConsumer unsubscribe: {}'.format(parking))
         log.info('ParkingConsumer disconnect: {}'.format(code))
+
+# CameraConsumer for camera image updates
+class CameraConsumer(WebsocketConsumer):
+    def connect(self):
+        self.accept()
+        log.info('CameraConsumer connect')
+
+    def receive(self, text_data):
+        try:
+            log.debug('CameraConsumer receive: {}'.format(text_data))
+            msg = json.loads(text_data)
+            if msg['type'] == 'CameraSubscribe':
+                with cameraSubscriptionsLock:
+                    if msg['cameraId'] not in cameraSubscriptions:
+                        cameraSubscriptions[msg['cameraId']] = []
+                    if self not in cameraSubscriptions[msg['cameraId']]:
+                        cameraSubscriptions[msg['cameraId']].append(self)
+                        log.info('CameraConsumer subscribe: {}'.format(msg['cameraId']))
+            elif msg['type'] == 'CameraUnsubscribe':
+                with cameraSubscriptionsLock:
+                    if msg['cameraId'] in cameraSubscriptions:
+                        if self in cameraSubscriptions[msg['cameraId']]:
+                            cameraSubscriptions[msg['cameraId']].remove(self)
+                            log.info('CameraConsumer unsubscribe: {}'.format(msg['cameraId']))
+            else:
+                log.warn('WebSocket receive unknown message type: {}'.format(msg['type']))
+        except Exception:
+            pass
+
+            
+    def disconnect(self, code):
+        with cameraSubscriptionsLock:
+            for camera in cameraSubscriptions.keys():
+                for conn in cameraSubscriptions[camera]:
+                    if self == conn:
+                        cameraSubscriptions[camera].remove(self)
+                        log.info('CameraConsumer unsubscribe: {}'.format(camera))
+        log.info('CameraConsumer disconnect: {}'.format(code))
 
 # WebSocket notifier class
 class ParkingNotifier(threading.Thread):
@@ -87,6 +125,11 @@ class ParkingNotifier(threading.Thread):
                     #Write image into file
                     with open(imageFile, 'wb') as fsock:
                         fsock.write(msg['image'])
+                    #Send to Subscribers
+                    with cameraSubscriptionsLock:
+                        if camera.pk in cameraSubscriptions:
+                            for conn in cameraSubscriptions[camera.pk]:
+                                conn.send(json.dumps({'timestamp': str(timezone.now())}))
                 self.messagesQueue.task_done()
             except Exception as e:
                 log.error('Exception processing message from ZyboBridge: {}'.format(e))
