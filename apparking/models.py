@@ -8,6 +8,8 @@ from .validators import IsPhoneValidator
 class Profile(models.Model):
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
 	phone = models.CharField(max_length=9,  validators=[IsPhoneValidator])
+	def __str__(self):
+		return User.objects.filter(pk=self.user.pk).first().username
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
@@ -18,11 +20,15 @@ class Parking(models.Model):
 	id = models.AutoField(primary_key=True)
 	name = models.TextField(unique=True)
 	dataFolder = models.TextField(unique=True)
+	def __str__(self):
+		return self.name
 
 class ParkingSpot(models.Model):
 	id = models.AutoField(primary_key=True)
 	parking = models.ForeignKey(to=Parking, on_delete=models.CASCADE)
 	number = models.IntegerField(default=0)
+	def __str__(self):
+		return Parking.objects.filter(pk=self.parking.pk).first().name + ":Spot" + str(self.number)
 	class Meta:
 		unique_together = (('parking', 'number'))
 
@@ -40,12 +46,16 @@ class ParkingSpotState(models.Model):
 	timestamp = models.DateTimeField(default=timezone.now)
 	state = models.IntegerField(choices=STATES, default=0)
 	forced = models.BooleanField(default=False)
+	def __str__(self):
+		return ParkingSpot.objects.filter(pk=self.parking_spot.pk).first().__str__()
 
 class ParkingCamera(models.Model):
 	id = models.AutoField(primary_key=True)
 	parking = models.ForeignKey(to=Parking, on_delete=models.CASCADE)
 	number = models.IntegerField(default=0)
 	dataFolder = models.TextField(unique=True)
+	def __str__(self):
+		return "Camera" + str(self.number)
 	class Meta:
 		unique_together = (('parking', 'number'))
 
@@ -54,6 +64,8 @@ class ParkingCameraSpot(models.Model):
 	camera = models.ForeignKey(to=ParkingCamera, on_delete=models.CASCADE)
 	parking_spot = models.ForeignKey(to=ParkingSpot, on_delete=models.CASCADE)
 	code = models.IntegerField(default=0)
+	def __str__(self):
+		return ParkingCamera.objects.filter(pk=self.camera.pk).first().__str__()
 	class Meta:
 		unique_together = (('camera', 'parking_spot'))
 
@@ -67,3 +79,5 @@ class Reservation(models.Model):
 	begin = models.DateTimeField()
 	end = models.DateTimeField()
 	status = models.IntegerField(choices=STATUS, default=0)
+	def __str__(self):
+		return User.objects.filter(pk=self.user.pk).first().username + ":" + str(self.timestamp)
