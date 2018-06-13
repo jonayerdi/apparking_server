@@ -9,6 +9,7 @@ var spotColors = {
     "Freeing": "purple",
     "Taken": "red",
     "Taking": "yellow",
+    "Reserved": "blue",
 }
 
 var ws;
@@ -49,7 +50,12 @@ function requestParkingSpot(spotId) {
         method : 'GET',
 		success: function(data) {
             spotNumber2spotId[data["number"]] = spotId;
-            updateParkingSpot(spotId, data["state"]["state"]);
+            state = data["state"]["state"];
+            if(state == "Free" && data["reservation"] != null)
+            {
+                state = "Reserved";
+            }
+            updateParkingSpot(spotId, state);
 		},
 		failure: function(data) { 
 			console.warn("Failed parking spot request to /api/parkings/");

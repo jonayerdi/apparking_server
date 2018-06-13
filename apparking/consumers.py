@@ -1,5 +1,5 @@
 from channels.generic.websocket import WebsocketConsumer
-from .models import ParkingSpot, ParkingSpotState, ParkingCamera
+from .models import ParkingSpot, ParkingSpotState, ParkingCamera, Reservation
 from .views import CAMERAS_ROOT
 from django.utils import timezone
 from .zybo_bridge.ZyboBridge import ZyboBridge
@@ -112,6 +112,9 @@ class ParkingNotifier(threading.Thread):
                         , state=ParkingSpotState.STATE_CODES[msg['state']], forced=msg['forced'])
                     newState.save()
                     #Send to Subscribers
+                    if msg['state'] == 'Free':
+                        if Reservation.objects.filter(parking_spot=parkingSpot.pk,begin__lte=timezone.now(), end__gt=timezone.now(), status=0).first() != None:
+                            msg['state'] = 'Reserved'
                     msg['timestamp'] = str(timezone.now())
                     log.debug('Sending message: {}'.format(json.dumps(msg)))
                     with parkingSpotSubscriptionsLock:
